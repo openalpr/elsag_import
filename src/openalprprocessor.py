@@ -5,7 +5,6 @@ import os
 import threading
 from argparse import ArgumentParser
 import time
-from Queue import Queue, Empty
 import multiprocessing
 import copy
 import json
@@ -14,8 +13,15 @@ from alprcommon import AlprProcessorConfig
 import requests
 import base64
 from PIL import Image
-import StringIO
-
+import platform
+if platform.python_version_tuple()[0] == '2':
+    _PYTHON_3=False
+    from StringIO import StringIO
+    from Queue import Queue, Empty
+else:
+    _PYTHON_3=True
+    from io import BytesIO
+    from queue import Queue, Empty
 
 threadLock = threading.Lock()
 thread_count = 0
@@ -71,7 +77,7 @@ class PlateUploader():
         # print json.dumps(upload_template, indent=2)
         # Upload to webserver
         while True:
-            print self.url
+            logger.debug("Posting to %s" % (self.url))
             r = requests.post(self.url, json=upload_template, timeout=self.timeout, verify=False)
 
             logger.info('Webserver POST status {}: {}'.format(r.status_code, r.text))
@@ -103,7 +109,10 @@ class PlateProcessorThread (threading.Thread):
         hsize = int((float(img.size[1]) * float(wpercent)))
         img = img.resize((new_width, hsize), Image.ANTIALIAS)
         img.save('sompic.jpg')
-        buffer = StringIO.StringIO()
+        if _PYTHON_3:
+            buffer = BytesIO()
+        else:
+            buffer = StringIO()
         img.save(buffer, format="JPEG")
         img_str = base64.b64encode(buffer.getvalue())
 

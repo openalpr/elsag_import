@@ -1,8 +1,13 @@
 
 import os
-import StringIO
+import platform
+if platform.python_version_tuple()[0] == '2':
+    from StringIO import StringIO
+    from ConfigParser import ConfigParser, NoOptionError
+else:
+    from io import StringIO
+    from configparser import ConfigParser, NoOptionError
 
-from ConfigParser import ConfigParser, NoOptionError
 
 
 class AlprProcessorConfig():
@@ -43,7 +48,7 @@ class AlprProcessorConfig():
         with open(self.config_file, 'r') as f:
             config_string = '[%s]\n' % (self.default_section_name) + f.read()
 
-        buf = StringIO.StringIO(config_string)
+        buf = StringIO(config_string)
         parser.readfp(buf)
 
         return parser
