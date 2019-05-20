@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
     NEEDED_DIRS = ['log', 'config' ]
     for adir in NEEDED_DIRS:
-        fulldir = os.path.join(CUR_DIR, adir)
+        fulldir = os.path.join(CUR_DIR, '../', adir)
         if not os.path.isdir(fulldir):
             os.makedirs(fulldir)
 
