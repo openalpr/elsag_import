@@ -45,7 +45,7 @@ class VehicleClassifier():
         try:
         # Load the .dll for Windows and the .so for Unix-based
             if platform.system().lower().find("windows") != -1:
-                self._vehicleclassifierpy_lib = ctypes.cdll.LoadLibrary("vehicleclassifierpy.dll")
+                self._vehicleclassifierpy_lib = ctypes.cdll.LoadLibrary("libvehicleclassifierpy.dll")
             elif platform.system().lower().find("darwin") != -1:
                 self._vehicleclassifierpy_lib = ctypes.cdll.LoadLibrary("libvehicleclassifierpy.dylib")
             else:
