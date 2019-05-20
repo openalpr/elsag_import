@@ -197,7 +197,7 @@ if __name__ == "__main__":
     if proc_config.log_file is not None:
         print("Logging to %s" % (proc_config.log_file))
         log_file = proc_config.log_file
-        handler = RotatingFileHandler(os.path.join(CUR_DIR, log_file), maxBytes=10000000, backupCount=1)
+        handler = RotatingFileHandler(log_file, maxBytes=10000000, backupCount=1)
         handler.setLevel(logging.INFO)
         logger.setLevel(logging.INFO)
         handler.setFormatter(formatter)

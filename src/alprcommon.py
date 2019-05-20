@@ -26,7 +26,7 @@ class AlprProcessorConfig():
 
 
         try:
-            self.log_file = parser.get(self.default_section_name, 'log_file')
+            self.log_file = os.path.join(CUR_DIR, '../log/', parser.get(self.default_section_name, 'log_file'))
         except NoOptionError:
             self.log_file = None
 
