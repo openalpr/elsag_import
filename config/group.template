@@ -1,0 +1,49 @@
+{
+   "best_uuid" : "",
+   "best_index": 0,
+   "agent_uid" : "",
+   "agent_type" : "alprd",
+   "uuids" : [
+   ],
+   "best_region_confidence" : 0,
+   "gps_longitude" : 0,
+   "best_image_height" : 256,
+   "vehicle" : {
+      "make_model" : [
+      ],
+      "body_type" : [
+      ],
+      "color" : [
+      ],
+      "orientation" : [
+      ],
+      "make" : [
+      ],
+      "year" : [
+      ]
+   },
+   "epoch_start" : 0,
+   "data_type" : "alpr_group",
+   "is_parked" : false,
+   "best_confidence" : 0,
+   "company_id" : "",
+   "best_plate" : {
+   },
+   "matches_template" : true,
+   "candidates" : [
+   ],
+   "plate_indexes" : [0],
+   "frame_end" : 0,
+   "agent_version" : "2.6.103",
+   "version" : 2,
+   "best_plate_number" : "",
+   "country" : "us",
+   "gps_latitude" : 0,
+   "best_image_width" : 256,
+   "best_region" : "",
+   "camera_id" : 0,
+   "frame_start" : 0,
+   "epoch_end" : 0,
+   "vehicle_crop_jpeg" : "",
+   "travel_direction" : 0
+}

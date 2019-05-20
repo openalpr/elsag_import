@@ -1,0 +1,13 @@
+certifi==2019.3.9
+chardet==3.0.4
+idna==2.8
+openalpr==1.0.12
+Pillow==6.0.0
+pkg-resources==0.0.0
+pymssql==2.1.4
+python-tds==1.9.1
+pytz==2019.1
+requests==2.22.0
+six==1.12.0
+urllib3==1.25.2
+vehicleclassifier==1.0
