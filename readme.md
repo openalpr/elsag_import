@@ -9,14 +9,15 @@ Installation
 -------------
 
 Install Python 2.7 from here:
+https://www.python.org/ftp/python/2.7.16/python-2.7.16.amd64.msi
 
 Download the OpenALPR script package and extract to C:\OpenALPR\elsag_import\
 
 Open a command line window (Start -> Run -> cmd) and type:
 
     cd C:\OpenALPR\elsag_import\
-    C:\python27\bin\pip.exe install -r requirements.txt
-    sc create "OpenALPR Elsag Import" binPath= "C:\Python27\Python.exe --C:\OpenALPR\elsag_import\src\import.py"
+    C:\python27\python.exe -m pip install -r requirements.txt
+    sc create "OpenALPR Elsag Import" binPath="C:\OpenALPR\elsag_import\import.bat"
 
 Configuration
 --------------
@@ -25,6 +26,7 @@ Download the OpenALPR SDK (tested with version 2.6.103):
 https://deb.openalpr.com/windows-sdk/openalpr64-sdk-2.6.103.zip
 
 Extract the files to C:\Openalpr\sdk\
+Download this file (for version 2.6.103): http://www.openalpr.com/downloads/libvehicleclassifierpy.dll
 
 Request an evaluation license key from here:
 https://license.openalpr.com/evalrequest/
