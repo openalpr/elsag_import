@@ -6,3 +6,4 @@ venv3/
 test_images/
 notes.txt
 state.json
+build/

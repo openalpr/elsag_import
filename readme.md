@@ -8,16 +8,19 @@ This should be installed on a server with network access to the Elsag MSSQL data
 Installation
 -------------
 
-Install Python 2.7 from here:
-https://www.python.org/ftp/python/2.7.16/python-2.7.16.amd64.msi
+Install Python 3.6 from here:
 
 Download the OpenALPR script package and extract to C:\OpenALPR\elsag_import\
 
-Open a command line window (Start -> Run -> cmd) and type:
+Download NSSM.exe https://nssm.cc/download
+
+Add C:\openalpr\sdk to your system path
+
+Open a command line window as administrator (Start -> Run -> cmd) and type:
 
     cd C:\OpenALPR\elsag_import\
-    C:\python27\python.exe -m pip install -r requirements.txt
-    sc create "OpenALPR Elsag Import" binPath="C:\OpenALPR\elsag_import\import.bat"
+    nssm.exe OpenALPRElsag
+    Use your Python.exe path, and working directory for Python.exe.  For arguments, use: C:\OpenALPR\elsag_import\src\import.py
 
 Configuration
 --------------
