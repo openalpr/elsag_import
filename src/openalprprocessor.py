@@ -14,6 +14,9 @@ import requests
 import base64
 from PIL import Image
 import platform
+from logging import StreamHandler
+import sys
+
 if platform.python_version_tuple()[0] == '2':
     _PYTHON_3=False
     from StringIO import StringIO
@@ -45,8 +48,10 @@ class PlateUploader():
     def upload(self, camera_name, epoch_time, plate_results, vehicle_results, plate_crop_jpeg_bytes, vehicle_crop_jpeg_bytes):
         upload_template = copy.copy(self.group_template)
 
+        print(plate_results)
         best_plate = plate_results['results'][0]
-        upload_template['vehicle'] = vehicle_results
+        del upload_template['vehicle']
+        # upload_template['vehicle'] = vehicle_results
         upload_template['best_plate'] = best_plate
         upload_template['best_plate']['plate_crop_jpeg'] = plate_crop_jpeg_bytes
 
@@ -71,7 +76,7 @@ class PlateUploader():
         upload_template['best_region'] = best_plate['region']
 
         upload_template['candidates'] = best_plate['candidates']
-        upload_template['vehicle_crop_jpeg'] = vehicle_crop_jpeg_bytes
+        #upload_template['vehicle_crop_jpeg'] = vehicle_crop_jpeg_bytes
 
         logger.debug(json.dumps(upload_template, indent=2))
         # print json.dumps(upload_template, indent=2)
@@ -102,19 +107,30 @@ class PlateProcessorThread (threading.Thread):
     def deactivate(self):
         self.active = False
 
-    def _resize_img(self, new_width, image_path):
+    def _resize_img(self, x,y,w,h, new_width, image_path):
 
         img = Image.open(image_path)
-        wpercent = (new_width / float(img.size[0]))
-        hsize = int((float(img.size[1]) * float(wpercent)))
-        img = img.resize((new_width, hsize), Image.ANTIALIAS)
-        img.save('sompic.jpg')
+        img_shape = img.size
+        if x < 0:
+            x = 0
+        if y < 0:
+            y = 0
+        if x+w > img_shape[0]:
+            x = img_shape[0] - w
+        if y+h > img_shape[1]:
+            y = img_shape[1] - h
+
+        cropped = img.crop((x,y,w+x,h+y))
+        wpercent = (new_width / float(cropped.size[0]))
+        hsize = int((float(cropped.size[1]) * float(wpercent)))
+        img = cropped.resize((new_width, hsize), Image.ANTIALIAS)
+        #img.save('sompic.jpg')
         if _PYTHON_3:
             buffer = BytesIO()
         else:
             buffer = StringIO()
         img.save(buffer, format="JPEG")
-        img_str = base64.b64encode(buffer.getvalue())
+        img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
         return img_str
 
@@ -123,7 +139,7 @@ class PlateProcessorThread (threading.Thread):
 
         # Parser config bypasses detection on crop
         parser_config = os.path.join(SCRIPT_DIR, '../config/', "openalprparser.conf")
-        self.alpr = Alpr(self.country, parser_config, "")
+        self.alpr = Alpr(self.country, "", "")
         self.vehicle_classifier = VehicleClassifier("","")
 
         config = AlprProcessorConfig()
@@ -156,18 +172,56 @@ class PlateProcessorThread (threading.Thread):
             # We have a plate to process, let's do it
             plate_results = self.alpr.recognize_file(curplate['crop_image'])
 
+            import json
+            print(json.dumps( plate_results, indent=2))
             # print plate_results
-            plate_crop_encoded = self._resize_img(150, curplate['crop_image'])
+            if len(plate_results['results']) > 0:
+                plate_coords = plate_results['results'][0]['coordinates']
+                min_x = plate_coords[0]['x']
+                max_x = plate_coords[0]['x']
+                min_y = plate_coords[0]['y']
+                max_y = plate_coords[0]['y']
+                for coord in plate_coords:
+                    if coord['x'] > max_x:
+                        max_x = coord['x']
+                    if coord['x'] < min_x:
+                        min_x = coord['x']
+                    if coord['y'] > max_y:
+                        max_y = coord['y']
+                    if coord['y'] < min_y:
+                        min_y = coord['y']
 
-            vehicle_results = self.vehicle_classifier.recognize_file(self.country, curplate['overview_image'])
-            # print vehicle_results
+                x = min_x
+                y = min_y
+                width = max_x - min_x
+                height = max_y - min_y
 
-            vehicle_crop_encoded = self._resize_img(256, curplate['overview_image'])
+                # Add 20%
+                adjust_x = width * 0.2
+                adjust_y = height * 0.2
+                x -= adjust_x /2
+                y -= adjust_y /2
+                width += adjust_x
+                height += adjust_y
 
-            plate_uploader.upload(curplate['camera_name'], curplate['epoch_time'], plate_results, vehicle_results, plate_crop_encoded, vehicle_crop_encoded )
+                print((x,y,width,height))
+                plate_crop_encoded = self._resize_img( x,y,width,height, 150, curplate['crop_image'])
+
+                # Skip vehicles for now.  In version 2.8.101 the vehicle detector can be used to scan / recognize the overview image
+
+                # vehicle_results = self.vehicle_classifier.recognize_file(self.country, curplate['overview_image'])
+                # print vehicle_results
+                vehicle_results = None
+                vehicle_crop_encoded = None
+
+                # vehicle_crop_encoded = self._resize_img(256, curplate['overview_image'])
+
+                plate_uploader.upload(curplate['camera_name'], curplate['epoch_time'], plate_results, vehicle_results, plate_crop_encoded, vehicle_crop_encoded )
 
 class OpenALPRProcessor():
     def __init__(self, num_threads=multiprocessing.cpu_count()):
+        if num_threads > 8:
+            num_threads = 8
         # Initialize the lib
         self.queue = Queue()
 
@@ -231,9 +285,19 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
+    print("Logging to console")
+    # If not configured, write to console
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler = StreamHandler(stream=sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.debug("Writing to Stream handler")
+
 
     processor = OpenALPRProcessor(num_threads=options.threads)
     processor.process(options.camera_name, options.epoch_time, options.crop_image, options.overview_image)
-    time.sleep(1.0)
+    time.sleep(5.0)
     processor.close()
     processor.join()
