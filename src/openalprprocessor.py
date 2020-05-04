@@ -248,7 +248,7 @@ class OpenALPRProcessor():
         logger.info("All processing threads started")
 
     ''' Process the image files and provide the JSON'''
-    def process(self, camera_name, epoch_time, crop_image, overview_image):
+    def process(self, camera_name, epoch_time, crop_image, overview_image, lat=None, lng=None):
         global threadLock
 
         threadLock.acquire()
