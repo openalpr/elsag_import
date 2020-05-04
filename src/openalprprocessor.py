@@ -151,7 +151,7 @@ class PlateProcessorThread (threading.Thread):
         # Parser config bypasses detection on crop
         parser_config = os.path.join(SCRIPT_DIR, '../config/', "openalprparser.conf")
         self.alpr = Alpr(self.country, "", "")
-        self.vehicle_classifier = VehicleClassifier("","")
+        #self.vehicle_classifier = VehicleClassifier("","")
 
         config = AlprProcessorConfig()
         plate_uploader = PlateUploader(config)
