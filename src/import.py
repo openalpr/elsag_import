@@ -22,14 +22,14 @@ log_file = os.path.join(CUR_DIR, '../log/', 'import.log')
 logger = logging.getLogger('import_logger')
 
 
-def _datetime_to_epochms( dt, tzinfo=None):
+def _datetime_to_epochms( dt, tzinfo=pytz.utc):
     epoch = datetime.datetime.utcfromtimestamp(0)
     if tzinfo is not None:
         epoch = epoch.replace(tzinfo=tzinfo)
     return int((dt - epoch).total_seconds() * 1000)
 
 
-def _epochms_to_datetime( epoch_ms, tzinfo=None):
+def _epochms_to_datetime( epoch_ms, tzinfo=pytz.utc):
     datestamp = datetime.datetime.utcfromtimestamp(float(epoch_ms) / 1000.0)
     if tzinfo is not None:
         datestamp = datestamp.replace(tzinfo=pytz.utc)
@@ -56,7 +56,7 @@ class ParsingState:
             json.dump(self.state, outf, indent=2)
 
     def get_last_parse(self):
-        return _epochms_to_datetime( self.state['last_parse'] )
+        return _epochms_to_datetime( self.state['last_parse'], True )
 
     def set_last_parse(self, newtime):
         self.state['last_parse'] = _datetime_to_epochms(newtime)
