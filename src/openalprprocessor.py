@@ -45,20 +45,28 @@ class PlateUploader():
         self.url = config.openalpr_url
         self.timeout = config.upload_timeout
 
-    def upload(self, camera_name, epoch_time, plate_results, vehicle_results, plate_crop_jpeg_bytes, vehicle_crop_jpeg_bytes):
+    def upload(self, curplate, plate_results, vehicle_results, plate_crop_jpeg_bytes, vehicle_crop_jpeg_bytes):
         upload_template = copy.copy(self.group_template)
 
-        print(plate_results)
+        camera_name = curplate['camera_name']
+        epoch_time = curplate['epoch_time']
+        
+        if curplate['lat'] != None and curplate['lng'] != None:
+            gps_latitude = curplate['lat']
+            gps_longitude = curplate['lng']
+        else:
+            gps_latitude = camera_config['gps_latitude']
+            gps_longitude = camera_config['gps_longitude']
+            
+        # print(plate_results)
         best_plate = plate_results['results'][0]
         del upload_template['vehicle']
         # upload_template['vehicle'] = vehicle_results
         upload_template['best_plate'] = best_plate
         upload_template['best_plate']['plate_crop_jpeg'] = plate_crop_jpeg_bytes
 
-        camera_config = self.config.get_camera_config(camera_name)
+        camera_config = self.config.get_camera_config(camera_name.upper())
         camera_id = camera_config['camera_id']
-        gps_latitude = camera_config['gps_latitude']
-        gps_longitude = camera_config['gps_longitude']
 
         uuid = '%s-%s-%s' % ( self.config.agent_uid, camera_id, epoch_time)
         upload_template['best_uuid'] = uuid
@@ -216,7 +224,7 @@ class PlateProcessorThread (threading.Thread):
 
                 # vehicle_crop_encoded = self._resize_img(256, curplate['overview_image'])
 
-                plate_uploader.upload(curplate['camera_name'], curplate['epoch_time'], plate_results, vehicle_results, plate_crop_encoded, vehicle_crop_encoded )
+                plate_uploader.upload(curplate, plate_results, vehicle_results, plate_crop_encoded, vehicle_crop_encoded )
 
 class OpenALPRProcessor():
     def __init__(self, num_threads=multiprocessing.cpu_count()):
@@ -246,7 +254,9 @@ class OpenALPRProcessor():
             "camera_name": camera_name,
             "epoch_time": epoch_time,
             "crop_image": crop_image,
-            "overview_image": overview_image
+            "overview_image": overview_image,
+            "lat": lat,
+            "lng": lng
             })
         threadLock.release()
 
