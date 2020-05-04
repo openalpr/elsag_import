@@ -119,8 +119,7 @@ class ElsagInterface:
             logger.debug("Found overview image {overview_image_path}".format(overview_image_path=overview_image_path))
 
         read_epoch = read_date
-        self.openalpr_processor.process(camera, _datetime_to_epochms(read_epoch), crop_image_path, overview_image_path)
-
+        self.openalpr_processor.process(camera, _datetime_to_epochms(read_epoch), crop_image_path, overview_image_path, lat, lng)
 
         # Parsing with OpenALPR
         # We have two images, do the LPR processing on one and the 
