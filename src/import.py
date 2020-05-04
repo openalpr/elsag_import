@@ -144,8 +144,8 @@ class ElsagInterface:
                             last_parse = self.parsing_state.get_last_parse()
                             logger.debug( "Last parse: " + str(last_parse))
 
-                            #cursor.execute('SELECT read_id, plate, camera, read_date, lat, lon FROM reads WHERE read_date > 2010-01-01 ORDER BY read_date asc LIMIT 1000')
-                            cursor.execute('SELECT TOP 1000 read_id, plate, camera, read_date, lat, lon FROM reads WHERE read_date > %s ORDER BY read_date ASC', (last_parse,))
+                            #cursor.execute('SELECT read_id, plate, device_id, read_date, lat, lon FROM reads WHERE read_date > 2010-01-01 ORDER BY read_date asc LIMIT 1000')
+                            cursor.execute('SELECT TOP 1000 read_id, plate, device_id, read_date, lat, lon FROM reads WHERE read_date > %s ORDER BY read_date ASC', (last_parse,))
 
 
                             results = cursor.fetchall()
@@ -160,7 +160,7 @@ class ElsagInterface:
                             for row in results:
                                 read_id = row[0]
                                 plate = row[1]
-                                camera = row[2]
+                                camera = str(row[2])
                                 read_date = row[3]
                                 lat = row[4]
                                 lng = row[5]
