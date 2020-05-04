@@ -71,6 +71,8 @@ class PlateUploader():
         uuid = '%s-%s-%s' % ( self.config.agent_uid, camera_id, epoch_time)
         upload_template['best_uuid'] = uuid
         upload_template['uuids'].append(uuid)
+        upload_template['camera_id'] = camera_id
+        upload_template['camera_name'] = camera_name
         upload_template['gps_latitude'] = gps_latitude
         upload_template['gps_longitude'] = gps_longitude
 
