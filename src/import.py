@@ -101,9 +101,9 @@ class ElsagInterface:
                 read_date = row[2]
                 plate_image_type = int(row[3])
                 if plate_image_type == OVERVIEW_IMAGE_ID:
-                    overview_image_path = os.path.join(self.base_image_path, image_id)
+                    overview_image_path = os.path.join(self.base_image_path, str(image_id))
                 elif plate_image_type == CROP_IMAGE_ID:
-                    crop_image_path = os.path.join(self.base_image_path, image_id)
+                    crop_image_path = os.path.join(self.base_image_path, str(image_id))
 
             logger.debug("Processing images.  Overview: %s  Crop: %s" % (overview_image_path, crop_image_path))
             for img in [overview_image_path, crop_image_path]:
