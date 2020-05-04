@@ -310,6 +310,6 @@ if __name__ == "__main__":
 
     processor = OpenALPRProcessor(num_threads=options.threads)
     processor.process(options.camera_name, options.epoch_time, options.crop_image, options.overview_image)
-    time.sleep(5.0)
+    time.sleep(15.0)
     processor.close()
     processor.join()
