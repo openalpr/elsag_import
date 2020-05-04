@@ -88,7 +88,8 @@ class PlateUploader():
         upload_template['candidates'] = best_plate['candidates']
         #upload_template['vehicle_crop_jpeg'] = vehicle_crop_jpeg_bytes
 
-        logger.debug(json.dumps(upload_template, indent=2))
+        #logger.debug(json.dumps(upload_template, indent=2))
+        logger.info("uploading plate " + best_plate['plate'])
         # print json.dumps(upload_template, indent=2)
         # Upload to webserver
         while True:
@@ -182,8 +183,8 @@ class PlateProcessorThread (threading.Thread):
             # We have a plate to process, let's do it
             plate_results = self.alpr.recognize_file(curplate['crop_image'])
 
-            import json
-            print(json.dumps( plate_results, indent=2))
+            #import json
+            #print(json.dumps( plate_results, indent=2))
             # print plate_results
             if len(plate_results['results']) > 0:
                 plate_coords = plate_results['results'][0]['coordinates']
@@ -214,7 +215,6 @@ class PlateProcessorThread (threading.Thread):
                 width += adjust_x
                 height += adjust_y
 
-                print((x,y,width,height))
                 plate_crop_encoded = self._resize_img( x,y,width,height, 150, curplate['crop_image'])
 
                 # Skip vehicles for now.  In version 2.8.101 the vehicle detector can be used to scan / recognize the overview image
